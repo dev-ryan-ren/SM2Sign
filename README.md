@@ -11,10 +11,10 @@
 3. 两端生成公钥的长度可能不统一，一般为服务器端公钥前缀有04，iOS端截取04即可，经验证不会影响
 
 ## 资源参考
-1.stevenpsm/GM_SM2 
-2.lbw_sm2_sign
-3.GmSSL            
-4.PBGMService
+1. stevenpsm/GM_SM2 
+2. lbw_sm2_sign
+3. GmSSL            
+4. PBGMService
 
 - [ ] **TODO**
     - [ ] 基于国密SM2、SM3的加解密
