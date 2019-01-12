@@ -36,9 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
  @param publickey 公钥
  @param originalStr 要签名的原文
  @param signStr 签名后的字符串
+ @param isPublikeySub 是否截取公钥前两位(04)
+ @param isBase64 是否裁剪公钥前两位(04)
  @return 通过与否
  */
-- (BOOL)vertifySignWithPublickey:(NSString *) publickey originalStr:(NSString *) originalStr signStr:(NSString *)signStr;
+- (BOOL)vertifySignWithPublickey:(NSString *) publickey originalStr:(NSString *) originalStr signStr:(NSString *)signStr isPublikeySub:(BOOL)isPublikeySub isBase64:(BOOL)isBase64;
 
 @end
 

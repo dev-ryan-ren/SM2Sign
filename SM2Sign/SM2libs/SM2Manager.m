@@ -18,9 +18,6 @@
 // SM2签名用的UID，两端要一致
 #define k_SM2UID @"renhepeng@51signing.com"
 
-// 服务器验签UID
-//#define k_SM2UID @"tongyu@51signing.com"
-
 @implementation SM2Manager
 
 #pragma mark -
@@ -63,6 +60,12 @@
 #pragma mark -  SM2 签名
 - (NSString *) signWithPritvatekey:(NSString *) pritvatekey publickey:(NSString *) publickey originalStr:(NSString *) originalStr{
     
+    // base64原文
+    // 两端中文符号(，！)等编码不一致会导致SM3消息摘要后的字符串不同，经验证会验签失败
+    NSData *base64Data =[originalStr dataUsingEncoding:NSUTF8StringEncoding];
+    originalStr = [base64Data base64EncodedStringWithOptions:0];
+    NSLog(@"签名base64原文=====>%@",originalStr);
+    
     NSString *signDataStr = @"";
     unsigned char result[256] = {0};
     unsigned long outlen = 256;
@@ -103,7 +106,20 @@
 
 #pragma mark -
 #pragma mark -  SM2验签
-- (BOOL)vertifySignWithPublickey:(NSString *) publickey originalStr:(NSString *) originalStr signStr:(NSString *)signStr{
+- (BOOL)vertifySignWithPublickey:(NSString *) publickey originalStr:(NSString *) originalStr signStr:(NSString *)signStr isPublikeySub:(BOOL)isPublikeySub isBase64:(BOOL)isBase64{
+
+    if(isBase64) {
+        NSData *base64Data =[originalStr dataUsingEncoding:NSUTF8StringEncoding];
+        originalStr = [base64Data base64EncodedStringWithOptions:0];
+        NSLog(@"验签base64原文=====>%@",originalStr);
+    }
+
+    // 截取公钥
+    // 两端生成公钥的长度可能不统一，一般为服务器端公钥前缀有04，iOS端截取04即可，经验证不会影响
+    if (isPublikeySub) {
+        publickey = [publickey substringFromIndex:2];
+        NSLog(@"验签服务器公钥=====> \n%@",publickey);
+    }
     
     BOOL isSuccess;
 
