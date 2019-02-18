@@ -156,6 +156,61 @@
 
 
 #pragma mark -
+#pragma mark -  SM2加密
+- (NSString * )encryptWithPublickey:(NSString *)publickey originalStr:(NSString *) originalStr{
+
+    NSData *keyData = [NSData dataFromHexString:publickey];
+    const char *encryptData = [originalStr cStringUsingEncoding:NSUTF8StringEncoding];
+
+    unsigned char result[1024] = {0};
+    unsigned long outlen = 1024;
+    
+    int ret = GM_SM2Encrypt(result,&outlen,(unsigned char *)encryptData,strlen(encryptData),(unsigned char *)keyData.bytes,keyData.length);
+    
+    if (outlen < 2 || ret != MP_OKAY) {
+        // 加密出错了
+        return @"";
+    }
+    
+    // 多一位\x04 需要去掉
+    NSData *data = [NSData dataWithBytes:result + 1 length:outlen - 1];
+    NSString *encrypStr = [data hexStringFromData:data];
+    return encrypStr;
+}
+
+#pragma mark -
+#pragma mark -  SM2解密
+- (NSString *)decryptWithPrivateKey:(NSString *)pritvatekey cipherText:(NSString *)cipherText{
+
+    //密文长度至少也需要64+32位
+    if ([cipherText length] < 64 + 32 || [pritvatekey length] == 0) {
+        return @"";
+    }
+    
+    NSData *keyData = [NSData dataFromHexString:pritvatekey];
+    NSData *data = [NSData dataFromHexString:cipherText];
+    
+    unsigned char result[1024 * 8] = {0};
+    unsigned char pass[1024] = {0};
+    unsigned long outlen = 1024;
+
+    pass[0] = '\x04'; //需要补一位\x04
+    memcpy(pass + 1, data.bytes, data.length);
+    
+    int ret = GM_SM2Decrypt((unsigned char *)result, &outlen, pass, data.length + 1, (unsigned char *)keyData.bytes, keyData.length);
+    
+    if (outlen == 0 || ret != MP_OKAY) {
+        //解密出错了
+        return @"";
+    }
+    NSString *originalStr = [[NSString alloc] initWithBytes:result length:outlen encoding:NSUTF8StringEncoding];
+    
+    return originalStr;
+}
+
+
+
+#pragma mark -
 #pragma mark - helper
 
 #pragma mark - oc字符串转为c字符

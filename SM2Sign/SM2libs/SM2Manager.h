@@ -42,6 +42,26 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL)vertifySignWithPublickey:(NSString *) publickey originalStr:(NSString *) originalStr signStr:(NSString *)signStr isPublikeySub:(BOOL)isPublikeySub isBase64:(BOOL)isBase64;
 
+
+/**
+ SM2加密
+
+ @param publickey 公钥
+ @param originalStr 原文
+ @return 加密后的字符串
+ */
+- (NSString *)encryptWithPublickey:(NSString *)publickey originalStr:(NSString *) originalStr;
+
+
+/**
+ SM2解密
+
+ @param pritvatekey 私钥
+ @param cipherText 密文
+ @return 解密后的原文
+ */
+- (NSString *)decryptWithPrivateKey:(NSString *)pritvatekey cipherText:(NSString *)cipherText;
+
 @end
 
 NS_ASSUME_NONNULL_END
